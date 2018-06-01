@@ -24,7 +24,6 @@ Command line arguments
 | -maildir  **&lt;path&gt;**                           | Path to directory to store user's mailboxes. Setting **%MAILDIR%** environment variable also enabled instead. 
 | -tempdir  **&lt;path&gt;**                           | Path to directory to store temporary files. Setting **%TEMP%** or **%TMP%** environment variables also enabled instead. 
 | -redirect-to-sender **&lt;true\|false\|yes\|no&gt;** | Enable or disable redirecting incoming messages to the sender's mailbox. **Enabled by default**.      
-|
 
 Java version
 -----
