@@ -1,0 +1,21 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug",
+            "type": "erlang",
+            "request": "launch",
+            "cwd": "${workspaceRoot}",
+            "arguments": "-s testmailsrv -smtp 2500 -pop3 1100 -maildir /tmp/mailboxes -tmpdir /tmp -redirect-to-sender no",
+            "preLaunchTask": "rebar3-debug.compile"
+        },
+        {
+            "name": "Debug Sync",
+            "type": "erlang",
+            "request": "launch",
+            "cwd": "${workspaceRoot}",
+            "arguments": "-s sync go -s testmailsrv -smtp 2500 -pop3 1100 -maildir /tmp/mailboxes -tmpdir /tmp",
+            "preLaunchTask": "rebar3-sync.compile"
+        }
+    ]
+}
