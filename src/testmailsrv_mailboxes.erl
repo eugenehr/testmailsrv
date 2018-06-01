@@ -24,7 +24,7 @@
 -behaviour(gen_server).
 
 %% API exports
--export([start_link/0, set_maildir/1, set_tempdir/1, redirect_to_sender/1, 
+-export([start_link/0, set_maildir/1, set_tempdir/1, set_redirect/1, 
          create_tempfile/0, add_message/3, lock_mailbox/1]).
 
 %% gen_server callbacks
@@ -49,9 +49,9 @@ set_tempdir(Dir) ->
     gen_server:call(?MODULE, {set_tempdir, Dir}).
 
 
-%% @doc Enable or disable redirecting SMTP messages to sender's mailbox
-redirect_to_sender(TrueFalse) ->
-    gen_server:call(?MODULE, {redirect_to_sender, TrueFalse}).
+%% @doc Set redirecting SMTP messages
+set_redirect(Redirect) ->
+    gen_server:call(?MODULE, {redirect, Redirect}).
 
 
 %% @doc Set a temporary file
@@ -75,7 +75,7 @@ lock_mailbox(Mailbox) ->
 -record(state, {
     maildir,
     tempdir,
-    redirect_to_sender = true,
+    redirect = none,
     locks = [],
     tempfiles = #{}
 }).
@@ -110,8 +110,8 @@ handle_call({set_tempdir, TempDir}, _From, State) ->
 
 %% @private
 %% @doc Enable or disable redirecting SMTP messages to sender's mailbox
-handle_call({redirect_to_sender, TrueFalse}, _From, State) ->
-    {reply, ok, State#state{redirect_to_sender = TrueFalse}};
+handle_call({redirect, Redirect}, _From, State) ->
+    {reply, ok, State#state{redirect = Redirect}};
 
 
 %% @private
@@ -126,9 +126,10 @@ handle_call({create_tempfile, Pid}, _From, #state{tempdir = TempDir, tempfiles =
 %% @private
 %% @doc Add message to user's mailboxes
 handle_call({add_message, Sender, Recipients, Message}, _From, #state{maildir = MailDir} = State) ->
-    Mailboxes = case State#state.redirect_to_sender of
-        true -> [Sender];
-        _    -> Recipients
+    Mailboxes = case State#state.redirect of
+        sender    -> [Sender];
+        none      -> Recipients;
+        Recipient -> [Recipient]
     end,
     MSecs = erlang:system_time(millisecond),
     Filename = lists:flatten(io_lib:format("~p.msg",[MSecs])),

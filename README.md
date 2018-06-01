@@ -23,7 +23,7 @@ Command line arguments
 | -pop3 **&lt;port&gt;**                               | Start the POP3 server on the given port
 | -maildir  **&lt;path&gt;**                           | Path to directory to store user's mailboxes. Setting **%MAILDIR%** environment variable also enabled instead. 
 | -tempdir  **&lt;path&gt;**                           | Path to directory to store temporary files. Setting **%TEMP%** or **%TMP%** environment variables also enabled instead. 
-| -redirect-to-sender **&lt;true\|false\|yes\|no&gt;** | Enable or disable redirecting incoming messages to the sender's mailbox. **Enabled by default**.      
+| -redirect **&lt;sender\|none\|john.doe@example.com&gt;** | Redirect incoming messages to the sender's mailbox (**sender**), to the given address (**john.doe@example.com** for example) or disable redirection (**none**). Disabled by default.      
 
 Java version
 -----

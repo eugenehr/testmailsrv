@@ -53,12 +53,11 @@ start(_StartType, _StartArgs) ->
              end
     end,    
     %% Set up SMTP mail redirecting
-    case init:get_argument('redirect-to-sender') of
+    case init:get_argument('redirect-to') of
         {ok, [[Redirect]]} -> case Redirect of
-            "true" -> testmailsrv_mailboxes:redirect_to_sender(true);
-            "yes" -> testmailsrv_mailboxes:redirect_to_sender(true);
-            "false" -> testmailsrv_mailboxes:redirect_to_sender(false);
-            "no" -> testmailsrv_mailboxes:redirect_to_sender(false)
+            "sender"  -> testmailsrv_mailboxes:set_redirect(sender);
+            "none"    -> testmailsrv_mailboxes:set_redirect(none);
+            _         -> testmailsrv_mailboxes:set_redirect(Redirect)
         end;
         _ -> ok    
     end,
