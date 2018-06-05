@@ -30,7 +30,7 @@
 %% API exports
 %%====================================================================
 
-%% @doc Start the testmailsrv application and all its dependecies
+%% @doc Start the testmailsrv application and all its dependencies
 start() ->
     application:ensure_all_started(testmailsrv).
 

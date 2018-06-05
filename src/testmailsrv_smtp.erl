@@ -112,14 +112,17 @@ handle(Socket, Transport, #state{data = false} = State, <<"NOOP">>) ->
 
 %% @private 
 %% @doc handle MAIL FROM: command
-handle(Socket, Transport, #state{data = false, mailbox = null} = State, <<"MAIL FROM:",Mailbox/binary>>) ->
+handle(Socket, Transport, #state{data = false, mailbox = null} = State, <<"MAIL ", F:1/binary, R:1/binary, O:1/binary, M:1/binary, ":", Mailbox/binary>>)
+        when    (F =:= <<"F">> orelse F =:= <<"f">>) andalso (R =:= <<"R">> orelse R =:= <<"r">>) 
+        andalso (O =:= <<"O">> orelse O =:= <<"o">>) andalso (M =:= <<"M">> orelse M =:= <<"m">>) ->
     Transport:send(Socket, "250 OK\r\n"),
     State#state{mailbox = clean_recipient(Mailbox)};
 
 
 %% @private 
 %% @doc handle RCPT TO: command
-handle(Socket, Transport, #state{data = false, recipients = Recipients} = State, <<"RCPT TO:",Recipient/binary>>) ->
+handle(Socket, Transport, #state{data = false, recipients = Recipients} = State, <<"RCPT ", T:1/binary, O:1/binary, ":", Recipient/binary>>) 
+        when (T =:= <<"T">> orelse T =:= <<"t">>) andalso (O =:= <<"O">> orelse O =:= <<"o">>) ->
     Transport:send(Socket, "250 OK\r\n"),
     State#state{recipients = [clean_recipient(Recipient) | Recipients]};
 
@@ -238,8 +241,20 @@ clean_recipient(Address) ->
     Size = byte_size(Address) - 1,
     case Address of
         <<Recipient:Size/binary, " ">> -> clean_recipient(Recipient);
-        <<Recipient:Size/binary, ">">> -> clean_recipient(Recipient);
-        _ -> Address
+        % <<Recipient:Size/binary, ">">> -> clean_recipient(Recipient);
+        _ -> clean_recipient(Address, 1)
+    end.
+
+
+%% @private
+%% @doc Clean recipient address
+clean_recipient(Bin, Size) when Size > byte_size(Bin) ->
+    Bin;
+
+clean_recipient(Bin, Size) ->
+    case Bin of
+        <<Address:Size/binary, ">", _/binary>> -> Address;
+        Bin -> clean_recipient(Bin, Size + 1)
     end.
 
 
